@@ -52,7 +52,7 @@ func init() {
 	})
 
 	registrar.RegisterBuildSideCar(bridge, func(adjunct *testnet.Adjunct) error {
-		err := buildBridge(adjunct, details)
+		err := buildBridge(adjunct)
 		if err != nil {
 			return util.LogError(err)
 		}
@@ -180,20 +180,27 @@ func handleConf(tn *testnet.TestNet, sysconf *sysConf) error {
 }
 
 func buildBridge(adjunct *testnet.Adjunct) error {
-	newConfig := new(sysethereumConf)
-
-	bridgeConf, err := makeConfig(*newConfig, &adjunct.Main.CombinedDetails)
+	newConfig, err := newBridgeConf(adjunct.Main.LDD.Params)
 	if err != nil {
 		return util.LogError(err)
 	}
 
-	err = handleConf()
+	bridgeConf, err := makeBridgeConfig(newConfig, &adjunct.Main.CombinedDetails)
+	if err != nil {
+		return util.LogError(err)
+	}
+
+	err = handleBridgeConf(adjunct.Main, bridgeConf)
+	if err != nil {
+		return util.LogError(err)
+	}
 
 
 	return nil
 }
 
-func handleBridgeConf(tn *testnet.TestNet, bridgeConf string) error {
+func handleBridgeConf(tn *testnet.TestNet, bridgeConf []byte) error {
+
 
 	return nil
 }
