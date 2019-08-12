@@ -21,6 +21,7 @@ package sysethereum
 import (
 	"fmt"
 	"sync"
+	"testing"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/whiteblock/genesis/protocols/helpers"
@@ -46,11 +47,21 @@ func init() {
 	registrar.RegisterParams(blockchain, helpers.DefaultGetParamsFn(blockchain))
 
 	// Adds geth nodes as sidecars
-	registrar.RegisterBlockchainSideCars(blockchain, func(tn *testnet.TestNet) []string {
+	registrar.RegisterBlockchainSideCars(blockchain, func(tn *testnet.TestNet) []string { // TODO: how to defer adding the sidecar until 1 syscoin block has been mined?
 		return []string{"geth", "sysethereum-agent"} // does this register 1 geth sidecar per syscoin  node?
+	})
+
+	registrar.RegisterBuildSideCar(bridge, func(adjunct *testnet.Adjunct) error {
+		err := buildBridge(adjunct, details)
+		if err != nil {
+			return util.LogError(err)
+		}
+
+		return nil
 	})
 }
 
+// Syscoin
 func regTest(tn *testnet.TestNet) error {
 	if tn.LDD.Nodes < 3 {
 		log.Error("Tried to build syscoin without enough nodes")
@@ -80,6 +91,7 @@ func regTest(tn *testnet.TestNet) error {
 	})
 }
 
+// Syscoin
 func handleConf(tn *testnet.TestNet, sysconf *sysConf) error {
 	ips := []string{}
 	for _, node := range tn.Nodes {
@@ -126,7 +138,7 @@ func handleConf(tn *testnet.TestNet, sysconf *sysConf) error {
 	senders := []string{}
 	receivers := []string{}
 
-	err = helpers.CreateConfigs(tn, "/syscoin/datadir/regtest.conf", func(node ssh.Node) ([]byte, error) {
+	err = helpers.CreateConfigs(tn, "/syscoin/datadir/regtest.conf", func(node ssh.Node) ([]byte, error) { // TODO why isn't sysconf accessible here?
 		defer tn.BuildState.IncrementBuildProgress()
 		confData := ""
 		maxConns := 1
@@ -163,6 +175,25 @@ func handleConf(tn *testnet.TestNet, sysconf *sysConf) error {
 	tn.BuildState.SetExt("masterNodes", masterNodes)
 	tn.BuildState.SetExt("senders", senders)
 	tn.BuildState.SetExt("receivers", receivers)
+
+	return nil
+}
+
+func buildBridge(adjunct *testnet.Adjunct) error {
+	newConfig := new(sysethereumConf)
+
+	bridgeConf, err := makeConfig(*newConfig, &adjunct.Main.CombinedDetails)
+	if err != nil {
+		return util.LogError(err)
+	}
+
+	err = handleConf()
+
+
+	return nil
+}
+
+func handleBridgeConf(tn *testnet.TestNet, bridgeConf string) error {
 
 	return nil
 }

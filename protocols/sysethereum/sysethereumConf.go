@@ -20,12 +20,12 @@ package sysethereum
 
 import (
 	"github.com/whiteblock/genesis/protocols/helpers"
-	"github.com/whiteblock/renaynay/genesis/protocols/services"
+	"github.com/whiteblock/genesis/db"
+	"github.com/whiteblock/genesis/util"
+	"github.com/whiteblock/mustache"
 )
 
-type sysethereumConf struct {
-	services.SysethereumService
-}
+type sysethereumConf map[string]interface{}
 
 type sysConf struct {
 	Options []string `json:"options"`
@@ -50,9 +50,21 @@ func newConf(data map[string]interface{}) (*sysConf, error) {
 	return out, helpers.HandleBlockchainConfig(blockchain, data, out)
 }
 
-func newSysethereumConf(data map[string]interface{}) (*sysethereumConf, error) {
-	out := new(sysethereumConf)
-	return out, helpers.HandleBlockchainConfig(bridge, data, out)
+func makeConfig(aconf sysethereumConf, details *db.DeploymentDetails) (string, error) { // TODO where does this get called?
+	sysEthConf, err := util.CopyMap(aconf)
+
+	filler := util.ConvertToStringMap(sysEthConf)
+	filler["contractsDirectory"] = "/contracts"
+	filler["dataDirectory"] = "/data"
+	if err != nil {
+		return "", util.LogError(err)
+	}
+
+	dat, err := helpers.GetBlockchainConfig("sysethereum", 0, "sysethereum.conf.mustache", details)
+	if err != nil {
+		return "", util.LogError(err)
+	}
+	return mustache.Render(string(dat), filler)
 }
 
 
