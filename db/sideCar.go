@@ -27,7 +27,7 @@ type SideCar struct {
 	ID string `json:"id"`
 
 	NodeID string `json:"nodeID"`
-
+=
 	AbsoluteNodeNum int `json:"absNum"`
 
 	// TestNetID is the id of the testnet to which the node belongs to
