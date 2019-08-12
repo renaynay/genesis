@@ -19,9 +19,17 @@
 package sysethereum
 
 import (
-
+	"github.com/whiteblock/genesis/util"
 )
 
-type sysethereumConf struct {
-	
+var conf *util.Config
+
+const bridge = "sysethereum"
+
+func init() {
+	conf = util.GetConfig()
+
+
+
 }
+

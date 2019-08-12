@@ -21,6 +21,8 @@ package syscoin
 
 import (
 	"fmt"
+	"sync"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/whiteblock/genesis/db"
 	"github.com/whiteblock/genesis/protocols/helpers"
@@ -28,7 +30,6 @@ import (
 	"github.com/whiteblock/genesis/ssh"
 	"github.com/whiteblock/genesis/testnet"
 	"github.com/whiteblock/genesis/util"
-	"sync"
 )
 
 var conf *util.Config
@@ -74,7 +75,7 @@ func regTest(tn *testnet.TestNet) error {
 	})
 }
 
-// Add handles adding a node to the artemis testnet
+// Add handles adding a node to the syscoin testnet
 // TODO
 func add(tn *testnet.TestNet) error {
 	return nil
