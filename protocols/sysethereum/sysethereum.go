@@ -185,7 +185,11 @@ func buildBridge(adjunct *testnet.Adjunct) error {
 		return util.LogError(err)
 	}
 
-	bridgeConf, err := makeBridgeConfig(newConfig, &adjunct.Main.CombinedDetails)
+	err = helpers.CreateConfigs(adjunct.Main, "/sysethereum.conf", func(node ssh.Node) ([]byte, error) {
+		defer adjunct.Main.BuildState.IncrementBuildProgress()
+		conf, err := makeBridgeConfig(newConfig, &adjunct.Main.CombinedDetails)
+		return []byte(conf), err
+	})
 	if err != nil {
 		return util.LogError(err)
 	}
@@ -194,7 +198,6 @@ func buildBridge(adjunct *testnet.Adjunct) error {
 	if err != nil {
 		return util.LogError(err)
 	}
-
 
 	return nil
 }

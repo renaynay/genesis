@@ -86,3 +86,4 @@ func makeBridgeConfig(aconf sysethereumConf, details *db.DeploymentDetails) ([]b
 }
 
 
+
